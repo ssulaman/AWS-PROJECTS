@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AWS Cognito Auth</title>
+  <script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@6.2.0/dist/amazon-cognito-identity.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(to right, #667eea, #764ba2);
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background-color: #fff;
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      max-width: 400px;
+      width: 100%;
+      transition: all 0.3s ease;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #4f46e5;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    button {
+      width: 100%;
+      background-color: #4f46e5;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background-color: #4338ca;
+    }
+
+    .switch {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+      color: #666;
+      cursor: pointer;
+    }
+
+    .hidden {
+      display: none;
+    }
+	
+	 footer {
+      position: absolute;
+      bottom: 15px;
+      font-size: 14px;
+      color: #eee;
+      text-align: center;
+    }
+
+    footer a {
+      color: #fff;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="signupContainer">
+    <h2>Sign Up</h2>
+    <input type="email" id="email" placeholder="Email" />
+    <input type="password" id="password" placeholder="Password" />
+    <button onclick="signUp()">Sign Up</button>
+    <div class="switch" onclick="toggleForms()">Already have a code? Confirm Account →</div>
+  </div>
+
+  <div class="container hidden" id="confirmContainer">
+    <h2>Confirm Email</h2>
+    <input type="email" id="confirmEmail" placeholder="Email" />
+    <input type="text" id="code" placeholder="Confirmation Code" />
+    <button onclick="confirmCode()">Confirm Account</button>
+    <div class="switch" onclick="toggleForms()">← Go back to Sign Up</div>
+  </div>
+  
+  <script>
+    // Replace with your actual Cognito details
+    const poolData = {
+      UserPoolId: 'ap-south-1_IG9ymKtNH',    // Your User Pool ID
+      ClientId: '3fr3btr4kutb136ognrs1915cr' // Your App Client ID
+    };
+
+    const userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
+
+    function toggleForms() {
+      document.getElementById('signupContainer').classList.toggle('hidden');
+      document.getElementById('confirmContainer').classList.toggle('hidden');
+    }
+
+    function signUp() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      const attributeList = [
+        new AmazonCognitoIdentity.CognitoUserAttribute({
+          Name: 'email',
+          Value: email
+        })
+      ];
+
+      userPool.signUp(email, password, attributeList, null, function(err, result) {
+        if (err) {
+          alert(err.message || JSON.stringify(err));
+          return;
+        }
+        alert('Sign up successful! Please check your email for a confirmation code.');
+        toggleForms();
+      });
+    }
+
+    function confirmCode() {
+      const email = document.getElementById('confirmEmail').value;
+      const code = document.getElementById('code').value;
+
+      const userData = {
+        Username: email,
+        Pool: userPool
+      };
+
+      const cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
+
+      cognitoUser.confirmRegistration(code, true, function(err, result) {
+        if (err) {
+          alert(err.message || JSON.stringify(err));
+          return;
+        }
+        alert('Account confirmed! Redirecting...');
+        window.open('https://github.com/ssulaman/AWS-PROJECTS'); // Change to your desired route
+      });
+    }
+  </script>
+  
+  <footer>
+    Built by <a href="#" target="_blank">SHAIK SULAMAN</a> © 2025
+  </footer>
+</body>
+</html>
