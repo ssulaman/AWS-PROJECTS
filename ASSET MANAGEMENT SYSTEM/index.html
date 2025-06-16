@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Asset Management System</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f4f7fa;
+      margin: 0;
+      padding: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .top-watermark,
+    .bottom-watermark {
+      position: relative;
+      left: 0;
+      bottom: auto;
+      right: auto;
+      font-size: 12px;
+      color: rgba(0, 0, 0, 0.3);
+      font-style: italic;
+      margin: 5px 0;
+      text-align: left;
+    }
+
+    .container {
+      max-width: 900px;
+      width: 100%;
+      background: #fff;
+      padding: 30px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      border-radius: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #333;
+    }
+
+    input, select, button {
+      width: 48%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+
+    input[type="date"] {
+      width: 100%;
+    }
+
+    button {
+      background-color: #007bff;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+      width: 100%;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    #message {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 30px;
+    }
+
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #ccc;
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    th {
+      background-color: #007bff;
+      color: white;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    .status {
+      font-weight: bold;
+    }
+
+    .watermark {
+      position: absolute;
+      bottom: 10px;
+      right: 20px;
+      font-size: 12px;
+      color: rgba(0, 0, 0, 0.3);
+      font-style: italic;
+    }
+
+    .form-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .form-row input, .form-row select {
+      width: 48%;
+    }
+
+    .form-row input[type="date"] {
+      width: 100%;
+    }
+
+    .watermark-inline {
+      font-size: 12px;
+      color: rgba(0, 0, 0, 0.3);
+      font-style: italic;
+      text-align: left;
+      margin: 5px 0 5px 5px;
+    }
+
+    /* New styles for smaller side-by-side action buttons */
+    .action-buttons button {
+      font-size: 14px;
+      padding: 4px 8px;
+      margin-right: 6px;
+      cursor: pointer;
+      border-radius: 4px;
+      border: 1px solid #007bff;
+      background-color: #007bff;
+      color: white;
+      width: auto;
+      min-width: 36px;
+      transition: background-color 0.3s;
+    }
+
+    .action-buttons button:last-child {
+      margin-right: 0;
+      border-color: #dc3545;
+      background-color: #dc3545;
+    }
+
+    .action-buttons button:hover {
+      opacity: 0.85;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  
+  <h1>Asset Management System</h1>
+  <div class="watermark-inline">Built by Shaik Sulaman / ssulamanofficial@gmail.com</div>
+
+  <!-- Form for adding/editing assets -->
+  <div class="form-row">
+    <input type="text" id="asset_name" placeholder="Asset Name" />
+    <input type="text" id="asset_type" placeholder="Asset Type" />
+  </div>
+  <div class="form-row">
+    <input type="date" id="purchase_date" />
+    <input type="text" id="assigned_to" placeholder="Assigned To" />
+  </div>
+  <div class="form-row">
+    <select id="status">
+      <option value="Available">Available</option>
+      <option value="In Use">In Use</option>
+      <option value="End Of Life / Support">End Of Life / Support</option>
+    </select>
+  </div>
+
+  <button onclick="addOrUpdateAsset()">➕ Add Asset</button>
+
+  <div id="message"></div>
+
+  <!-- Table to show assets -->
+  <table>
+    <thead>
+      <tr>
+        <th>Asset Name</th>
+        <th>Type</th>
+        <th>Purchase Date</th>
+        <th>Assigned To</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="assetTableBody">
+      <!-- Assets will be loaded here -->
+    </tbody>
+  </table>
+
+  <!-- Watermark text -->
+  <div class="watermark">Built by Shaik Sulaman / ssulamanofficial@gmail.com</div>
+  
+</div>
+
+<script>
+  const API = 'http://localhost:3000/api/assets';
+  let editingId = null;
+
+  // Simple function to sanitize output (optional but recommended)
+  function escapeHtml(text) {
+    if (!text) return '';
+    return text.replace(/[&<>"']/g, function(m) {
+      return {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      }[m];
+    });
+  }
+
+  async function fetchAssets() {
+    try {
+      const res = await fetch(API);
+      if (!res.ok) throw new Error('Failed to fetch assets');
+      const assets = await res.json();
+      const table = document.getElementById('assetTableBody');
+      table.innerHTML = '';
+
+      assets.forEach(asset => {
+        const row = document.createElement('tr');
+
+        row.innerHTML = `
+          <td>${escapeHtml(asset.asset_name)}</td>
+          <td>${escapeHtml(asset.asset_type)}</td>
+          <td>${new Date(asset.purchase_date).toLocaleDateString()}</td>
+          <td>${escapeHtml(asset.assigned_to || '')}</td>
+          <td class="status">${escapeHtml(asset.status)}</td>
+          <td class="action-buttons">
+            <button onclick="editAsset(${asset.id})" title="Edit Asset">✏️</button>
+            <button onclick="deleteAsset(${asset.id})" title="Delete Asset">🗑️</button>
+          </td>
+        `;
+
+        table.appendChild(row);
+      });
+    } catch (error) {
+      console.error('Error loading assets:', error);
+      document.getElementById('message').innerText = '❌ Could not load assets.';
+      document.getElementById('message').style.color = 'red';
+    }
+  }
+
+  async function addOrUpdateAsset() {
+    const asset = {
+      asset_name: document.getElementById('asset_name').value.trim(),
+      asset_type: document.getElementById('asset_type').value.trim(),
+      purchase_date: document.getElementById('purchase_date').value,
+      assigned_to: document.getElementById('assigned_to').value.trim(),
+      status: document.getElementById('status').value
+    };
+
+    const messageDiv = document.getElementById('message');
+
+    if (!asset.asset_name || !asset.asset_type || !asset.purchase_date) {
+      messageDiv.innerText = '❌ Please fill in required fields (Name, Type, Purchase Date).';
+      messageDiv.style.color = 'red';
+      return;
+    }
+
+    try {
+      const res = await fetch(editingId ? `${API}/${editingId}` : API, {
+        method: editingId ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(asset)
+      });
+
+      if (res.ok) {
+        messageDiv.innerText = editingId ? '✅ Asset updated!' : '✅ Asset added!';
+        messageDiv.style.color = 'green';
+        clearForm();
+        editingId = null;
+        document.querySelector('button[onclick="addOrUpdateAsset()"]').innerText = '➕ Add Asset';
+        fetchAssets();
+      } else {
+        const errorText = await res.text();
+        messageDiv.innerText = `❌ Error: ${errorText}`;
+        messageDiv.style.color = 'red';
+      }
+    } catch (err) {
+      console.error('Add/Update failed:', err);
+      messageDiv.innerText = '❌ Network error!';
+      messageDiv.style.color = 'red';
+    }
+  }
+
+  async function deleteAsset(id) {
+    if (!confirm('Are you sure you want to delete this asset?')) return;
+
+    try {
+      const res = await fetch(`${API}/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        document.getElementById('message').innerText = '✅ Asset deleted.';
+        document.getElementById('message').style.color = 'green';
+        fetchAssets();
+      } else {
+        const errText = await res.text();
+        document.getElementById('message').innerText = `❌ Error deleting asset: ${errText}`;
+        document.getElementById('message').style.color = 'red';
+      }
+    } catch (err) {
+      console.error('Delete failed:', err);
+      document.getElementById('message').innerText = '❌ Network error during delete.';
+      document.getElementById('message').style.color = 'red';
+    }
+  }
+
+  async function editAsset(id) {
+    try {
+      const res = await fetch(API);
+      if (!res.ok) throw new Error('Failed to fetch assets for editing');
+      const assets = await res.json();
+      const asset = assets.find(a => a.id === id);
+      if (!asset) throw new Error('Asset not found');
+
+      document.getElementById('asset_name').value = asset.asset_name;
+      document.getElementById('asset_type').value = asset.asset_type;
+      document.getElementById('purchase_date').value = asset.purchase_date.split('T')[0]; // YYYY-MM-DD format
+      document.getElementById('assigned_to').value = asset.assigned_to;
+      document.getElementById('status').value = asset.status;
+
+      editingId = id;
+      document.querySelector('button[onclick="addOrUpdateAsset()"]').innerText = '💾 Update Asset';
+      document.getElementById('message').innerText = '';
+    } catch (err) {
+      console.error(err);
+      document.getElementById('message').innerText = '❌ Failed to load asset for editing.';
+      document.getElementById('message').style.color = 'red';
+    }
+  }
+
+  function clearForm() {
+    document.getElementById('asset_name').value = '';
+    document.getElementById('asset_type').value = '';
+    document.getElementById('purchase_date').value = '';
+    document.getElementById('assigned_to').value = '';
+    document.getElementById('status').value = 'Available';
+  }
+
+  // Load assets on page load
+  window.onload = fetchAssets;
+</script>
+</body>
+</html>
