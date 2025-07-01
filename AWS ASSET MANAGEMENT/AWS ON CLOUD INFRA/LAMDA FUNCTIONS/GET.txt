@@ -1,0 +1,32 @@
+import boto3
+import json
+from boto3.dynamodb.conditions import Key
+
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('Assets')
+
+def lambda_handler(event, context):
+    try:
+        response = table.scan()
+        items = response.get('Items', [])
+
+        # ✅ Sort items by purchase_date (descending)
+        items.sort(key=lambda x: x.get('purchase_date', ''), reverse=True)
+
+        return {
+            'statusCode': 200,
+            'headers': {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            },
+            'body': json.dumps(items)
+        }
+
+    except Exception as e:
+        return {
+            'statusCode': 500,
+            'headers': {
+                'Access-Control-Allow-Origin': '*'
+            },
+            'body': json.dumps({'error': str(e)})
+        }

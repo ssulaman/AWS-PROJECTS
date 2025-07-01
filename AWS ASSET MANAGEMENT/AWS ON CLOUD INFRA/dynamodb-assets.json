@@ -1,0 +1,82 @@
+[
+  {
+    "id": "1",
+    "asset_name": "Dell Latitude 5420",
+    "asset_type": "Laptop",
+    "purchase_date": "2023-01-10",
+    "assigned_to": "IT Manager",
+    "status": "In Use"
+  },
+  {
+    "id": "2",
+    "asset_name": "Cisco 2960 Switch",
+    "asset_type": "Networking",
+    "purchase_date": "2022-06-14",
+    "assigned_to": "Network Rack 3",
+    "status": "Available"
+  },
+  {
+    "id": "3",
+    "asset_name": "HP LaserJet Pro M404",
+    "asset_type": "Printer",
+    "purchase_date": "2021-11-22",
+    "assigned_to": "Reception Desk",
+    "status": "In Use"
+  },
+  {
+    "id": "4",
+    "asset_name": "MacBook Pro 16\"",
+    "asset_type": "Laptop",
+    "purchase_date": "2023-09-01",
+    "assigned_to": "Design Team",
+    "status": "In Use"
+  },
+  {
+    "id": "5",
+    "asset_name": "Logitech MX Master 3",
+    "asset_type": "Peripheral",
+    "purchase_date": "2022-08-03",
+    "assigned_to": "IT Inventory Shelf",
+    "status": "Available"
+  },
+  {
+    "id": "6",
+    "asset_name": "Lenovo ThinkPad T14",
+    "asset_type": "Laptop",
+    "purchase_date": "2022-04-18",
+    "assigned_to": "Support Engineer",
+    "status": "End Of Life / Support"
+  },
+  {
+    "id": "7",
+    "asset_name": "Dell U2723QE Monitor",
+    "asset_type": "Monitor",
+    "purchase_date": "2023-03-27",
+    "assigned_to": "Graphics Department",
+    "status": "In Use"
+  },
+  {
+    "id": "8",
+    "asset_name": "Ubiquiti UniFi AP AC Pro",
+    "asset_type": "Networking",
+    "purchase_date": "2022-01-30",
+    "assigned_to": "Conference Room",
+    "status": "In Use"
+  },
+  {
+    "id": "9",
+    "asset_name": "Surface Dock 2",
+    "asset_type": "Peripheral",
+    "purchase_date": "2023-02-14",
+    "assigned_to": "HR Department",
+    "status": "Available"
+  },
+  {
+    "id": "10",
+    "asset_name": "Canon EOS M50 Camera",
+    "asset_type": "Media Device",
+    "purchase_date": "2021-10-10",
+    "assigned_to": "Media Production Team",
+    "status": "In Use"
+  }
+]

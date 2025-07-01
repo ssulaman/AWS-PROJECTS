@@ -1,0 +1,11 @@
+id,asset_name,asset_type,purchase_date,assigned_to,status
+1,"Dell Latitude 5420",Laptop,2023-01-10,"IT Manager","In Use"
+2,"Cisco 2960 Switch",Networking,2022-06-14,"Network Rack 3",Available
+3,"HP LaserJet Pro M404",Printer,2021-11-22,"Reception Desk","In Use"
+4,"MacBook Pro 16"",Laptop,2023-09-01,"Design Team","In Use"
+5,"Logitech MX Master 3",Peripheral,2022-08-03,"IT Inventory Shelf",Available
+6,"Lenovo ThinkPad T14",Laptop,2022-04-18,"Support Engineer","End Of Life / Support"
+7,"Dell U2723QE Monitor",Monitor,2023-03-27,"Graphics Department","In Use"
+8,"Ubiquiti UniFi AP AC Pro",Networking,2022-01-30,"Conference Room","In Use"
+9,"Surface Dock 2",Peripheral,2023-02-14,"HR Department",Available
+10,"Canon EOS M50 Camera","Media Device",2021-10-10,"Media Production Team","In Use"
