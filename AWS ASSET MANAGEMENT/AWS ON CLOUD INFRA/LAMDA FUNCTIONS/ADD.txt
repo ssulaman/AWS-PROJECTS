@@ -1,0 +1,41 @@
+import boto3
+import json
+
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('Assets')
+
+def lambda_handler(event, context):
+    try:
+        # ✅ Safely extract and parse the JSON body
+        if 'body' not in event:
+            raise ValueError("Missing request body")
+
+        body = json.loads(event['body'])
+
+        # ✅ Validate required fields
+        required_fields = ['id', 'asset_name', 'asset_type', 'purchase_date', 'assigned_to', 'status']
+        if not all(field in body for field in required_fields):
+            return {
+                'statusCode': 400,
+                'headers': {'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'error': 'Missing required fields'})
+            }
+
+        # ✅ Put item into DynamoDB
+        table.put_item(Item=body)
+
+        return {
+            'statusCode': 201,
+            'headers': {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            },
+            'body': json.dumps({'message': 'Asset added successfully'})
+        }
+
+    except Exception as e:
+        return {
+            'statusCode': 500,
+            'headers': {'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': str(e)})
+        }
